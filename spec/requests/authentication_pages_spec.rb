@@ -55,6 +55,7 @@ describe "Authentication" do
 
     describe "for non-signed-in users" do
       let(:user) { FactoryGirl.create(:user) }
+    describe "in the Users controller" do
 
       describe "when attempting to visit a protected page" do
         before do
@@ -82,6 +83,17 @@ describe "Authentication" do
             expect(page).to have_title('Edit user')
           end
 
+          describe "visiting the following page" do
+          before { visit following_user_path(user) }
+          it { should have_title('Sign in') }
+        end
+
+        describe "visiting the followers page" do
+          before { visit followers_user_path(user) }
+          it { should have_title('Sign in') }
+        end
+      end
+
           describe "when signing in again" do
             before do
               click_link "Sign out"
@@ -105,6 +117,18 @@ describe "Authentication" do
 
         describe "submitting to the destroy action" do
           before { delete micropost_path(FactoryGirl.create(:micropost)) }
+          specify { expect(response).to redirect_to(signin_path) }
+        end
+      end
+
+      describe "in the Relationships controller" do
+        describe "submitting to the create action" do
+          before { post relationships_path }
+          specify { expect(response).to redirect_to(signin_path) }
+        end
+
+        describe "submitting to the destroy action" do
+          before { delete relationship_path(1) }
           specify { expect(response).to redirect_to(signin_path) }
         end
       end
